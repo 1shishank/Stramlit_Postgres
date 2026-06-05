@@ -1,13 +1,17 @@
+from dotenv import load_dotenv
+import os
 import psycopg2
+
+load_dotenv()
 
 def get_connection():
     try:
         conn = psycopg2.connect(
-            database="Bank_DB",
-            user="postgres",
-            password="Helloworld12#",
-            host="127.0.0.1",
-            port=5432
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
         )
         return conn
     except Exception as e:
