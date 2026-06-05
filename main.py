@@ -2,25 +2,93 @@ import streamlit as st
 import pandas as pd
 from connection import get_connection
 
-st.title("Employee Dashboard")
+tab1, tab2 = st.tabs(
+    ["Upload Report", "View Report"]
+)
 
-conn = get_connection()
+# ----------------------------
+# TAB 1 - Upload Report
+# ----------------------------
+with tab1:
 
-if conn:
+    st.title("Backup Health Dashboard")
 
-    query = "SELECT * FROM employees"
+    upload_date = st.date_input("Select Report Date")
 
-    df = pd.read_sql(query, conn)
+    uploaded_file = st.file_uploader(
+        "Upload Excel File",
+        type=["xlsx"]
+    )
 
-    st.success("Database Connected Successfully")
+    if uploaded_file:
 
-    st.subheader("Employee Records")
+        df = pd.read_excel(uploaded_file)
 
-    st.dataframe(df)
+        conn = get_connection()
+        cur = conn.cursor()
 
-    conn.close()
+        for _, row in df.iterrows():
 
-else:
-    st.error("Failed to connect to PostgreSQL")
+            cur.execute(
+                """
+                INSERT INTO backup_status
+                (
+                    report_date,
+                    backup_server,
+                    ip_address,
+                    status,
+                    remarks
+                )
+                VALUES (%s,%s,%s,%s,%s)
+                """,
+                (
+                    upload_date,
+                    row["Backup Server"],
+                    row["IP Address"],
+                    row["Status"],
+                    row["Remarks"]
+                )
+            )
 
-##python -m streamlit run app.py
+        conn.commit()
+        conn.close()
+
+        st.success("Report Uploaded Successfully")
+
+
+# ----------------------------
+# TAB 2 - View Report
+# ----------------------------
+with tab2:
+
+    st.header("View Report")
+
+    selected_date = st.date_input(
+        "Choose Date To View",
+        key="view_date"
+    )
+
+    if st.button("Fetch Report"):
+
+        conn = get_connection()
+
+        query = """
+        SELECT
+            backup_server,
+            ip_address,
+            status,
+            remarks
+        FROM backup_status
+        WHERE report_date = %s
+        ORDER BY backup_server
+        """
+
+        df = pd.read_sql(
+            query,
+            conn,
+            params=[selected_date]
+        )
+
+        st.dataframe(df)
+
+        conn.close()
