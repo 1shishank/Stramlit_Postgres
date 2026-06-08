@@ -101,37 +101,36 @@ with tab2:
         )
         st.dataframe(df)
 
-"""
+# """
+# st.title("PostgreSQL Query Console")
 
-st.title("PostgreSQL Query Console")
+# query = st.text_area(
+#     "Enter SQL Query",
+#     height=150,
+#     placeholder="SELECT * FROM backup_status LIMIT 10;"
+# )
 
-query = st.text_area(
-    "Enter SQL Query",
-    height=150,
-    placeholder="SELECT * FROM backup_status LIMIT 10;"
-)
+# if st.button("Run Query"):
 
-if st.button("Run Query"):
+#     if not query.strip():
+#         st.warning("Please enter a query.")
+#     else:
+#         try:
+#             conn = get_connection()
 
-    if not query.strip():
-        st.warning("Please enter a query.")
-    else:
-        try:
-            conn = get_connection()
+#             df = pd.read_sql_query(query, conn)
 
-            df = pd.read_sql_query(query, conn)
+#             st.success("Query executed successfully.")
 
-            st.success("Query executed successfully.")
+#             st.dataframe(
+#                 df,
+#                 use_container_width=True
+#             )
 
-            st.dataframe(
-                df,
-                use_container_width=True
-            )
+#             conn.close()
 
-            conn.close()
-
-        except Exception as e:
-            st.error(f"Error: {e}")
+#         except Exception as e:
+#             st.error(f"Error: {e}")
        
 
-"""
+# """
