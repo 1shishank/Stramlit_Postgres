@@ -30,14 +30,19 @@ with tab1:
 
     if uploaded_file:
 
-        df = pd.read_excel(uploaded_file)
+        if uploaded_file.size > 10 * 1024 * 1024:
+            st.error("File too large")
+            st.stop()
 
-        conn = get_connection()
-        cur = conn.cursor()
+        try:
+            df = pd.read_excel(uploaded_file)
 
-        for _, row in df.iterrows():
+            conn = get_connection()
+            cur = conn.cursor()
 
-            cur.execute(
+            for _, row in df.iterrows():
+
+                cur.execute(
                 """
                 INSERT INTO backup_status
                 (
@@ -58,12 +63,15 @@ with tab1:
                 )
             )
 
-          
-        conn.commit()
-        conn.close()
+            conn.commit()
+            st.success("Report Uploaded Successfully")
 
-        st.success("Report Uploaded Successfully")
-        
+        except Exception as e:
+            st.error(f"Upload Failed: {e}")
+
+        finally:
+            conn.close()
+           
         
 
 
