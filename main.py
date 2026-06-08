@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from connection import get_connection
+from datetime import date
 
 tab1, tab2 = st.tabs(
     ["Upload Report", "View Report"]
@@ -13,7 +14,14 @@ with tab1:
 
     st.title("Backup Health Dashboard")
 
-    upload_date = st.date_input("Select Report Date")
+    upload_date = date.today()
+
+    # Display date (read-only)
+    st.text_input(
+     "Report Date",
+        value=str(upload_date),
+        disabled=True
+        )
 
     uploaded_file = st.file_uploader(
         "Upload Excel File",
@@ -50,10 +58,13 @@ with tab1:
                 )
             )
 
+          
         conn.commit()
         conn.close()
 
         st.success("Report Uploaded Successfully")
+        
+        
 
 
 # ----------------------------
@@ -90,6 +101,8 @@ with tab2:
         )
         st.dataframe(df)
 
+"""
+
 st.title("PostgreSQL Query Console")
 
 query = st.text_area(
@@ -121,3 +134,4 @@ if st.button("Run Query"):
             st.error(f"Error: {e}")
        
 
+"""
